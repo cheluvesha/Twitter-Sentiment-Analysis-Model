@@ -5,7 +5,7 @@ import java.io.FileNotFoundException
 import com.awsUtils.AWSConfiguration
 import com.utilities.Utility
 import org.apache.log4j.Logger
-import org.apache.spark.ml.Pipeline
+import org.apache.spark.ml.{Pipeline, PipelineModel}
 import org.apache.spark.ml.classification.LogisticRegression
 import org.apache.spark.ml.evaluation.{
   BinaryClassificationEvaluator,
@@ -134,6 +134,33 @@ object TwitterTrainModel {
     println(s"F1 : ${eval.setMetricName("f1").evaluate(predictionDF)}")
   }
 
+  /***
+    * Testing the model using sample text data
+    * @param testFile String
+    * @param modelFilePath String
+    */
+  def testPredictionForTestData(
+      testFile: String,
+      modelFilePath: String
+  ): Unit = {
+    try {
+      logger.info("testing the model using sample data")
+      val testDataDF =
+        sparkSession.read.textFile(testFile).withColumnRenamed("value", "tweet")
+      val model = PipelineModel.load(modelFilePath)
+      val predictedDF = model.transform(testDataDF)
+      predictedDF.select("tweet", "prediction").show()
+    } catch {
+      case sqlAnalysisException: org.apache.spark.sql.AnalysisException =>
+        logger.error(sqlAnalysisException.printStackTrace())
+        throw new Exception("Unable to execute a query")
+      case invalidInputException: org.apache.hadoop.mapred.InvalidInputException =>
+        logger.error(invalidInputException.printStackTrace())
+        throw new Exception("Model file path is not exist")
+    }
+
+  }
+
   // entry point to an application
   def main(args: Array[String]): Unit = {
     val s3Path = "s3a://twitter-historic-data/*.csv"
@@ -143,6 +170,7 @@ object TwitterTrainModel {
       System.getenv("AWS_ACCESS_KEY"),
       System.getenv("AWS_SECRET_KEY")
     )
+    val testFile = "./TestData/ml_model_test.txt"
     logger.info("AWS configuration successful if it is true: " + status)
     val tweetsRawDF = readDataFromS3AndCreateDF(s3Path)
     tweetsRawDF.cache()
@@ -154,6 +182,7 @@ object TwitterTrainModel {
     predictionDF.show()
     predictionDF.cache()
     evaluatingMetricForThePrediction(predictionDF)
+    testPredictionForTestData(testFile, modelFilePath = pathToSaveModel)
   }
 
 }
