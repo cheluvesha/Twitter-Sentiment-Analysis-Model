@@ -6,11 +6,11 @@ scalaVersion := "2.12.10"
 
 scapegoatVersion in ThisBuild := "1.3.8"
 
-libraryDependencies += "org.apache.spark" %% "spark-core" % "3.0.0"
+libraryDependencies += "org.apache.spark" %% "spark-core" % "3.0.0" % "provided"
 
-libraryDependencies += "org.apache.spark" %% "spark-sql" % "3.0.0"
+libraryDependencies += "org.apache.spark" %% "spark-sql" % "3.0.0" % "provided"
 
-libraryDependencies += "org.apache.spark" %% "spark-mllib" % "3.0.0"
+libraryDependencies += "org.apache.spark" %% "spark-mllib" % "3.0.0" % "provided"
 
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.8" % Test
 
