@@ -2,6 +2,9 @@ package com.utilities
 
 import org.apache.spark.sql.SparkSession
 
+/***
+  * Utility Class which provides Commonly used functions
+  */
 object Utility {
 
   /***

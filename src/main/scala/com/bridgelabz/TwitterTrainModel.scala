@@ -15,6 +15,9 @@ import org.apache.spark.ml.feature._
 import org.apache.spark.sql.functions.regexp_replace
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
+/***
+  * Class which trains ML model for sentiment prediction
+  */
 object TwitterTrainModel {
 
   val sparkSession: SparkSession = Utility.createSparkSessionObj("Train Model")
@@ -163,14 +166,14 @@ object TwitterTrainModel {
 
   // entry point to an application
   def main(args: Array[String]): Unit = {
-    val s3Path = "s3a://twitter-historic-data/*.csv"
-    val pathToSaveModel = "Model"
+    val s3Path = args(0)
+    val pathToSaveModel = args(1)
     val status = AWSConfiguration.connectToS3(
       sparkSession.sparkContext,
       System.getenv("AWS_ACCESS_KEY"),
       System.getenv("AWS_SECRET_KEY")
     )
-    val testFile = "./TestData/ml_model_test.txt"
+    val testFile = args(2)
     logger.info("AWS configuration successful if it is true: " + status)
     val tweetsRawDF = readDataFromS3AndCreateDF(s3Path)
     tweetsRawDF.cache()

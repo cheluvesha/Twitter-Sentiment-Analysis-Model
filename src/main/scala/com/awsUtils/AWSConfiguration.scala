@@ -3,8 +3,19 @@ package com.awsUtils
 import org.apache.log4j.Logger
 import org.apache.spark.SparkContext
 
+/***
+  * Class which configures the AWS S3 file system
+  */
 object AWSConfiguration {
   val logger: Logger = Logger.getLogger(getClass.getName)
+
+  /***
+    * Uses S3a connector to establish a connection with AWS S3
+    * @param sparkContext SparkContext
+    * @param awsAccessKey String
+    * @param awsSecretKey String
+    * @return Boolean
+    */
   def connectToS3(
       sparkContext: SparkContext,
       awsAccessKey: String,
@@ -29,6 +40,5 @@ object AWSConfiguration {
         logger.error(illegalArgException.printStackTrace())
         throw new Exception("Hadoop AWS properties are not valid")
     }
-
   }
 }
